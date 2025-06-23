@@ -13,12 +13,16 @@ export default [
     route("contacts/:contactId/edit", "routes/edit-contact.tsx"),
     route("contacts/:contactId/destroy", "routes/destroy-contact.tsx"),
   ]),
-  route("/about", "routes/about.tsx"),
-  route("/posts/:postId", "routes/posts.tsx"),
+
+  layout("layouts/user-layout.tsx", [
+    route("/about", "routes/about.tsx"),
+    route("/posts/:postId", "routes/posts.tsx"),
+  ]),
 
   /// Nested Routes
-  layout("routes/dashboard.tsx", [
+  layout("layouts/dashboard-layout.tsx", [
     ...prefix("dashboard", [
+      route("sign-in", "routes/admin-sign-in.tsx"),
       route("finances", "routes/finances.tsx"),
       route("personal-info", "routes/personal-info.tsx"),
     ]),
