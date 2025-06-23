@@ -2,14 +2,12 @@ import { Outlet } from "react-router";
 
 const DashboardLayout = () => {
   return (
-    <div>
+    <main className="w-full px-12 flex min-h-screen flex-col bg-blue-300">
       <header>
         <h1>Dashboard Header</h1>
-        {/* You can include navigation links here */}
       </header>
 
       <div className="sidebar">
-        {/* Sidebar content */}
         <nav>
           <ul>
             <li>
@@ -23,14 +21,13 @@ const DashboardLayout = () => {
       </div>
 
       <main>
-        {/* The Outlet will render the nested route content */}
         <Outlet />
       </main>
 
       <footer>
         <p>Dashboard Footer</p>
       </footer>
-    </div>
+    </main>
   );
 };
 

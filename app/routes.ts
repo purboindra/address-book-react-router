@@ -22,6 +22,7 @@ export default [
   /// Nested Routes
   layout("layouts/dashboard-layout.tsx", [
     ...prefix("dashboard", [
+      index("routes/dashboard.tsx"),
       route("sign-in", "routes/admin-sign-in.tsx"),
       route("finances", "routes/finances.tsx"),
       route("personal-info", "routes/personal-info.tsx"),
