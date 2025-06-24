@@ -6,5 +6,6 @@ export const auth = betterAuth({
     enabled: true,
     autoSignIn: false,
   },
+  trustedOrigins: ["http://localhost:5173"],
   database: new Database("./sqlite.db"),
 });
