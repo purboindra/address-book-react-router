@@ -19,9 +19,6 @@ export default [
     route("/posts/:postId", "routes/posts.tsx"),
   ]),
 
-  /// API Authentication
-  route("api/auth/sign-up/email", "routes/api/auth.tsx"),
-
   /// Nested Routes
   layout("layouts/dashboard-layout.tsx", [
     ...prefix("dashboard", [
@@ -30,6 +27,7 @@ export default [
       route("finances", "routes/finances.tsx"),
       route("personal-info", "routes/personal-info.tsx"),
       route("auth/sign-up", "routes/dashboard/auth/sign-up.tsx"),
+      route("auth/sign-in", "routes/dashboard/auth/sign-in.tsx"),
     ]),
   ]),
 ] satisfies RouteConfig;

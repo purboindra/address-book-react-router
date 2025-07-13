@@ -1,34 +1,12 @@
 import { useState } from "react";
 import { Form } from "react-router";
-import { authClient } from "~/lib/auth-client";
 
 export default function SignUp() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
 
-  const signUp = async () => {
-    await authClient.signUp.email(
-      {
-        email,
-        password,
-        name,
-      },
-      {
-        onRequest: (ctx) => {
-          // show loading state
-        },
-        onSuccess: (ctx) => {
-          // redirect to home
-          alert("Sign up successful");
-        },
-        onError: (ctx) => {
-          console.log(ctx.error.message);
-          alert(ctx.error.message);
-        },
-      }
-    );
-  };
+  const signUp = async () => {};
 
   return (
     <div className="flex flex-col gap-4 items-center justify-center min-h-screen">
