@@ -4,5 +4,11 @@ export default {
   // Config options...
   // Server-side render by default, to enable SPA mode set this to `false`
   ssr: true,
+  routeDiscovery: {
+    mode: "initial",
+  },
+  future: {
+    unstable_viteEnvironmentApi: true,
+  },
   prerender: ["/about"],
 } satisfies Config;

@@ -1,26 +1,27 @@
 import { Form, redirect, useNavigation, type MetaFunction } from "react-router";
 import type { Route } from "./+types/sign-in";
 import { createUserSession, getUserId } from "~/services/session.server";
+import { Button } from "~/components/ui/button";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "Dashboard Sign In" },
+    { name: "description", content: "Welcome to Our Project!" },
   ];
 };
 
 export async function loader({ request }: Route.LoaderArgs) {
   const userId = await getUserId(request);
   if (userId) {
-    return redirect("/");
+    return redirect("/dashboard/products");
   }
 }
 
 export async function action({ request }: Route.ActionArgs) {
   let response: Response;
   try {
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-
     const formData = await request.formData();
     const email = formData.get("email")?.toString();
     const password = formData.get("password")?.toString();
@@ -30,11 +31,14 @@ export async function action({ request }: Route.ActionArgs) {
       throw new Error("Invalid email or password");
     }
 
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
     // Create a session
     response = await createUserSession({
       request,
       userId: "aaron@mail.com",
       remember: true,
+      redirectUrl: "/dashboard/products",
     });
 
     if (!response) {
@@ -42,9 +46,8 @@ export async function action({ request }: Route.ActionArgs) {
     }
   } catch (error) {
     if (error instanceof Error) {
-      return { error: error.message };
+      return { error: error.message, timestamp: Date.now() };
     }
-
     return { error: "An unknown error occurred" };
   }
 
@@ -55,6 +58,13 @@ export default function Login({ actionData }: Route.ComponentProps) {
   const navigation = useNavigation();
 
   const isSubmitting = navigation.state === "submitting";
+
+  useEffect(() => {
+    if (actionData?.timestamp) {
+      toast.error(actionData?.error);
+    }
+  }, [actionData]);
+
   return (
     <div className="p-8 min-w-3/4 w-96">
       <h1 className="text-2xl">React Router v7 Auth: Login</h1>
@@ -69,9 +79,9 @@ export default function Login({ actionData }: Route.ComponentProps) {
             <input className="flex-1" type="password" name="password" />
           </div>
           <div className="flex flex-row-reverse mt-4">
-            <button type="submit" className="border rounded px-2.5 py-1 w-32">
+            <Button className="w-[124px]">
               {isSubmitting ? "Loading..." : "Login"}
-            </button>
+            </Button>
           </div>
           {actionData?.error ? (
             <div className="flex flex-row">

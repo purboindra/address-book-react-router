@@ -1,15 +1,19 @@
 import {
-  Form,
   Scripts,
   ScrollRestoration,
   isRouteErrorResponse,
   Outlet,
   redirect,
+  useNavigation,
+  Meta,
 } from "react-router";
 import type { Route } from "./+types/root";
 import { createEmptyContact } from "./data";
 
 import appStylesHref from "./app.css?url";
+import { Toaster } from "./components/ui/sonner";
+import GlobalSpinner from "./components/global-spinner";
+import "./app.css";
 
 export async function action() {
   const contact = await createEmptyContact();
@@ -17,7 +21,14 @@ export async function action() {
 }
 
 export default function App() {
-  return <Outlet />;
+  const navigation = useNavigation();
+  const isNavigating = Boolean(navigation.location);
+  return (
+    <>
+      {isNavigating && <GlobalSpinner />}
+      <Outlet />
+    </>
+  );
 }
 
 // The Layout component is a special export for the root route.
@@ -30,9 +41,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href={appStylesHref} />
+        <Meta />
       </head>
       <body>
         {children}
+        <Toaster />
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -53,6 +66,15 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
       error.status === 404
         ? "The requested page could not be found."
         : error.statusText || details;
+  } else if (error instanceof Error) {
+    return (
+      <div>
+        <h1>Error</h1>
+        <p>{error.message}</p>
+        <p>The stack trace is:</p>
+        <pre>{error.stack}</pre>
+      </div>
+    );
   } else if (import.meta.env.DEV && error && error instanceof Error) {
     details = error.message;
     stack = error.stack;
