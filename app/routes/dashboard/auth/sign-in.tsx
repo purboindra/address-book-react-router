@@ -26,7 +26,6 @@ export async function action({ request }: Route.ActionArgs) {
     const email = formData.get("email")?.toString();
     const password = formData.get("password")?.toString();
 
-    // Check the user's credentials
     if (email !== "aaron@mail.com" || password !== "password") {
       throw new Error("Invalid email or password");
     }

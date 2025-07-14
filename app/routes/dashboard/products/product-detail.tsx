@@ -1,24 +1,47 @@
 import {
   Form,
   Link,
+  redirect,
   useActionData,
   useFetcher,
   useNavigate,
+  useNavigation,
 } from "react-router";
 import type { Route } from "./+types/product-detail";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
+import { BASE_URL } from "~/lib/utils";
 
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
   const id = formData.get("id");
-  const response = await fetch(`https://dummyjson.com/products/${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+
+  const _action = formData.get("_action");
+  const isUpdate = _action === "update";
+
+  const title = formData.get("title");
+
+  let response: Response;
+
+  if (isUpdate) {
+    response = await fetch(`${BASE_URL}/products/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        title: title,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } else {
+    response = await fetch(`${BASE_URL}/products/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  }
 
   const data = await response.json();
 
@@ -26,20 +49,16 @@ export async function action({ request }: Route.ActionArgs) {
     return {
       message: data.message || "Unexpected Error",
       data: null,
+      timestamp: Date.now(),
     };
   }
 
-  console.log("data", data);
-
-  return {
-    message: data.message || "Success",
-    isDeleted: true,
-  };
+  return redirect("/dashboard/products");
 }
 
 export async function loader({ params }: Route.LoaderArgs) {
   const productId = params.id;
-  const response = await fetch(`https://dummyjson.com/products/${productId}`, {
+  const response = await fetch(`${BASE_URL}/products/${productId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -70,22 +89,26 @@ export function meta({ params }: { params: any }) {
   ];
 }
 
-export default function ProductDetail({ loaderData }: Route.ComponentProps) {
-  const fetcher = useFetcher();
-  const isDeleting = fetcher.state !== "idle";
-  const isDeleted = fetcher.data?.isDeleted;
+export default function ProductDetail({
+  loaderData,
+  actionData,
+}: Route.ComponentProps) {
   const navigate = useNavigate();
+  const navigation = useNavigation();
 
-  const actionData = useActionData();
-
-  console.log("actionData", actionData);
-  console.log("fetcher", fetcher.data);
+  const { message, data, timestamp } = actionData || {};
+  const isSubmitting =
+    navigation.state === "submitting" &&
+    navigation?.formData?.get("_action") === "delete";
+  const isSubmittingUpdate =
+    navigation.state === "submitting" &&
+    navigation?.formData?.get("_action") === "update";
 
   useEffect(() => {
-    if (isDeleted) {
-      toast.success(`Successfully delete product: ${loaderData?.data?.title}`);
+    if (message) {
+      toast.error(message);
     }
-  }, [isDeleted]);
+  }, [timestamp]);
 
   if (loaderData.data === null) {
     return (
@@ -98,19 +121,14 @@ export default function ProductDetail({ loaderData }: Route.ComponentProps) {
   return (
     <div className="flex flex-col max-w-5xl w-full h-screen mx-auto py-8">
       <h1 className="text-3xl font-semibold mb-6">{loaderData.data.title}</h1>
-      <h3 className="text-xl font-semibold mb-6">
+      <h3 className="text-xl font-normal mb-6">
         {loaderData.data.description}
       </h3>
 
       <div className="flex w-full gap-4">
+        {/* DELETE BUTTON */}
         <Form
-          action="delete"
           method="delete"
-          onError={(event) => {
-            event.preventDefault();
-            console.log("error");
-            toast.error("Failed to delete product");
-          }}
           onSubmit={(event) => {
             const response = confirm(
               "Please confirm you want to delete this record."
@@ -120,13 +138,43 @@ export default function ProductDetail({ loaderData }: Route.ComponentProps) {
             }
           }}
         >
-          <button type="submit" className="hover:cursor-pointer">
-            Delete
+          <input type="hidden" name="id" value={loaderData.data.id} />
+          <button
+            disabled={isSubmitting}
+            type="submit"
+            className="hover:cursor-pointer"
+            name="_action"
+            value={"delete"}
+          >
+            {isSubmitting ? "Deleting..." : "Delete"}
           </button>
         </Form>
+        {/* UPDATE BUTTON */}
+        <Form
+          method="post"
+          onSubmit={(event) => {
+            const response = confirm(
+              "Please confirm you want to update this record."
+            );
+            if (!response) {
+              event.preventDefault();
+            }
+          }}
+        >
+          <input type="hidden" name="id" value={loaderData.data.id} />
+          <button
+            disabled={isSubmittingUpdate}
+            type="submit"
+            name="_action"
+            value={"update"}
+            className="hover:cursor-pointer"
+          >
+            {isSubmittingUpdate ? "Updating..." : "Update"}
+          </button>
+        </Form>
+        {/* CANCEL */}
         <Button
           variant="destructive"
-          disabled={isDeleting}
           onClick={() => navigate(-1)}
           type="button"
           asChild

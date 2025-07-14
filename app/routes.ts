@@ -23,17 +23,20 @@ export default [
   layout("layouts/dashboard-layout.tsx", [
     ...prefix("dashboard", [
       index("routes/dashboard.tsx"),
+      /// DASHBOARD AUTHENTICATION
       route("sign-in", "routes/admin-sign-in.tsx"),
-      route("finances", "routes/finances.tsx"),
-      route("personal-info", "routes/personal-info.tsx"),
       route("auth/sign-up", "routes/dashboard/auth/sign-up.tsx"),
       route("auth/sign-in", "routes/dashboard/auth/sign-in.tsx"),
-      route("products", "routes/dashboard/products/products.tsx"),
-      route("products/:id", "routes/dashboard/products/product-detail.tsx"),
-      route(
-        "products/:id/delete",
-        "routes/dashboard/products/delete-product.tsx"
-      ),
+
+      route("finances", "routes/finances.tsx"),
+      route("personal-info", "routes/personal-info.tsx"),
+
+      /// DASHBOARD PRODUCTS
+      route("products", "routes/dashboard/products/products.tsx", [
+        index("routes/dashboard/products/products.tsx"),
+        route(":id", "routes/dashboard/products/product-detail.tsx"),
+        route(":id/delete", "routes/dashboard/products/delete-product.tsx"),
+      ]),
     ]),
   ]),
 ] satisfies RouteConfig;

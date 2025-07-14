@@ -1,19 +1,11 @@
 import type { Product } from "~/types/productInterface";
 import type { Route } from "./+types/products";
-import { Link, useFetcher } from "react-router";
+import { Link } from "react-router";
 import { Input } from "~/components/ui/input";
 import { useSearchParams } from "react-router";
 import { useEffect, useState } from "react";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "~/components/ui/pagination";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { BASE_URL } from "~/lib/utils";
 
 export async function loader({ request }: Route.LoaderArgs) {
   let url = new URL(request.url);
@@ -23,9 +15,9 @@ export async function loader({ request }: Route.LoaderArgs) {
   console.log("product query", query);
 
   const response = await fetch(
-    `https://dummyjson.com/products/${
-      query != null ? `search?q=${query}` : ""
-    }/?skip=${(Number(page) - 1) * 10}&limit=10`,
+    `${BASE_URL}/products/${query != null ? `search?q=${query}` : ""}/?skip=${
+      (Number(page) - 1) * 10
+    }&limit=10`,
     {
       method: "GET",
       headers: {
