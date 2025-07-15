@@ -10,7 +10,7 @@ import { getContacts } from "../data";
 import type { Route } from "./+types/sidebar";
 import { useEffect, useState } from "react";
 
-export async function loader({ request }: Route.LoaderArgs) {
+export async function clientLoader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
   const contacts = await getContacts(q);

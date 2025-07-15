@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { BASE_URL } from "~/lib/utils";
 
-export async function action({ request }: Route.ActionArgs) {
+export async function clientAction({ request }: Route.ActionArgs) {
   const formData = await request.formData();
   const id = formData.get("id");
 
@@ -56,7 +56,7 @@ export async function action({ request }: Route.ActionArgs) {
   return redirect("/dashboard/products");
 }
 
-export async function loader({ params }: Route.LoaderArgs) {
+export async function clientLoader({ params }: Route.LoaderArgs) {
   const productId = params.id;
   const response = await fetch(`${BASE_URL}/products/${productId}`, {
     method: "GET",

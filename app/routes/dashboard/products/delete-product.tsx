@@ -2,7 +2,7 @@ import { redirect, data } from "react-router";
 import type { Route } from "./+types/delete-product";
 import { BASE_URL } from "~/lib/utils";
 
-export async function action({ params }: Route.ActionArgs) {
+export async function clientAction({ params }: Route.ActionArgs) {
   const response = await fetch(`${BASE_URL}/products/${params.id}`, {
     method: "DELETE",
     headers: {

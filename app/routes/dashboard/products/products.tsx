@@ -3,20 +3,17 @@ import type { Route } from "./+types/products";
 import { Link } from "react-router";
 import { Input } from "~/components/ui/input";
 import { useSearchParams } from "react-router";
-import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { BASE_URL } from "~/lib/utils";
 
-export async function loader({ request }: Route.LoaderArgs) {
+export async function clientLoader({ request }: Route.LoaderArgs) {
   let url = new URL(request.url);
   let query = url.searchParams.get("q");
   let page = url.searchParams.get("page") || "1";
 
-  console.log("product query", query);
-
   const response = await fetch(
-    `${BASE_URL}/products/${query != null ? `search?q=${query}` : ""}/?skip=${
-      (Number(page) - 1) * 10
+    `${BASE_URL}/products/${query != null ? `search?q=${query}` : ""}&skip=${
+      Number(page) * 10
     }&limit=10`,
     {
       method: "GET",
@@ -30,8 +27,15 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   if (!response.ok) {
     return {
-      message: data.message || "Unexpected Error",
-      products: [] as Product[],
+      error: data.message || "Unexpected Error",
+    };
+  }
+
+  const products = data.products as Product[];
+
+  if (products.length == 0) {
+    return {
+      error: "Data not found",
     };
   }
 
@@ -39,6 +43,10 @@ export async function loader({ request }: Route.LoaderArgs) {
     message: data.message || "Success",
     products: data.products as Product[],
   };
+}
+
+export function HydrateFallback() {
+  return <div>Loading...</div>;
 }
 
 export function meta() {
@@ -51,12 +59,6 @@ export default function Products({ loaderData }: Route.ComponentProps) {
   const q = searchParams.get("q");
   const page = searchParams.get("page") || "1";
 
-  const [query, setQuery] = useState(q || "");
-
-  useEffect(() => {
-    setQuery(q || "");
-  }, [searchParams]);
-
   const handlePagination = (type: "next" | "prev") => {
     if (type === "next") {
       setSearchParams({ page: (Number(page) + 1).toString() });
@@ -65,10 +67,10 @@ export default function Products({ loaderData }: Route.ComponentProps) {
     }
   };
 
-  if (loaderData.products.length === 0) {
+  if (loaderData.error || !loaderData.products) {
     return (
       <div className="mx-auto h-screen w-full max-w-5xl items-center justify-center flex">
-        Loading...
+        {loaderData.error || "Unknown Error Occured"}
       </div>
     );
   }
@@ -87,9 +89,7 @@ export default function Products({ loaderData }: Route.ComponentProps) {
           }}
         />
       </div>
-      {query && (
-        <h3 className="text-xl font-semibold mb-6">Result for {query}</h3>
-      )}
+      {q && <h3 className="text-xl font-semibold mb-6">Result for {q}</h3>}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {loaderData?.products.map((product: Product) => (
           <Link

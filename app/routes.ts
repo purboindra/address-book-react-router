@@ -31,9 +31,10 @@ export default [
       route("finances", "routes/finances.tsx"),
       route("personal-info", "routes/personal-info.tsx"),
 
+      route("maps", "routes/dashboard/maps.tsx"),
+
       /// DASHBOARD PRODUCTS
       route("products", "routes/dashboard/products/products.tsx", [
-        index("routes/dashboard/products/products.tsx"),
         route(":id", "routes/dashboard/products/product-detail.tsx"),
         route(":id/delete", "routes/dashboard/products/delete-product.tsx"),
       ]),

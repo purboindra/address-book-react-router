@@ -3,7 +3,7 @@ import type { Route } from "./+types/edit-contact";
 
 import { getContact, updateContact } from "../data";
 
-export async function action({ request, params }: Route.ActionArgs) {
+export async function clientAction({ request, params }: Route.ActionArgs) {
   const formData = await request.formData();
   const updates = Object.fromEntries(formData);
   const firstName = formData.get("first");
@@ -13,7 +13,7 @@ export async function action({ request, params }: Route.ActionArgs) {
   return redirect(`/contacts/${params.contactId}`);
 }
 
-export async function loader({ params }: Route.LoaderArgs) {
+export async function clientLoader({ params }: Route.LoaderArgs) {
   const contact = await getContact(params.contactId);
   if (!contact) {
     throw new Response("Not Found", { status: 404 });

@@ -1,7 +1,7 @@
 import { Form } from "react-router";
 import type { Route } from "./+types/posts";
 
-export async function clientLoader({ params }: Route.LoaderArgs) {
+export async function clientclientLoader({ params }: Route.LoaderArgs) {
   const postId = params.postId;
   const response = await fetch(
     `https://jsonplaceholder.typicode.com/posts/${postId}`

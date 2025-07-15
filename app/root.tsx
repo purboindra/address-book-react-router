@@ -14,8 +14,9 @@ import appStylesHref from "./app.css?url";
 import { Toaster } from "./components/ui/sonner";
 import GlobalSpinner from "./components/global-spinner";
 import "./app.css";
+import "leaflet/dist/leaflet.css";
 
-export async function action() {
+export async function clientAction() {
   const contact = await createEmptyContact();
   return redirect(`/contacts/${contact.id}/edit`);
 }
